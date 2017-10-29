@@ -1,0 +1,39 @@
+local CONSTANTS = require "libs.constants"
+local HASHES = require "libs.hashes"
+local input = require "libs.input"
+local screen = require "libs.screen"
+local lume = require "libs.lume"
+
+local HALF_MAP_WIDTH = CONSTANTS.MAP_WIDTH/2
+local HALF_MAP_HEIGHT = CONSTANTS.MAP_HEIGHT/2
+
+function init(self)
+	msg.post("#map_camera", "acquire_camera_focus")
+	input.acquire()
+	self.camera_pos = go.get_position("map_camera")
+	screen.map_camera_pos = self.camera_pos
+end
+
+function final(self)
+	input.release()
+end
+
+local function clamp_camera_pos(camera_pos)
+	local max_x = HALF_MAP_WIDTH - screen.world_width/2
+	local max_y = HALF_MAP_HEIGHT - screen.world_height/2
+	
+	camera_pos.x = lume.clamp(camera_pos.x, -max_x, max_x)
+	camera_pos.y = lume.clamp(camera_pos.y, -max_y, max_y)
+end	
+
+function on_input(self,action_id,action)
+	if action_id == HASHES.INPUT_TOUCH then
+		local dx, dy = action.screen_dx, action.screen_dy
+		local scale = screen.world_height/screen.screen_height
+		dx, dy = dx * scale, dy * scale
+		self.camera_pos.x = self.camera_pos.x - dx
+		self.camera_pos.y = self.camera_pos.y - dy
+		clamp_camera_pos(self.camera_pos)
+		go.set_position(self.camera_pos, "map_camera")
+	end	
+end	

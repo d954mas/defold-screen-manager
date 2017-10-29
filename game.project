@@ -1,21 +1,47 @@
 [project]
-title = My project
+title = Screen manager
 version = 0.1
+dependencies = https://github.com/britzl/defcon/archive/master.zip https://github.com/britzl/defnet/archive/master.zip
 
 [bootstrap]
-main_collection = /main/main.collectionc
+main_collection = /main.collectionc
+render = /render/my.renderc
 
 [input]
-game_binding = /input/game.input_bindingc
-use_accelerometer = 0
+game_binding = /game.input_bindingc
 
 [display]
-width = 1280
-height = 720
+width = 540
+height = 960
+high_dpi = 1
+display_profiles = /render/my.display_profilesc
+variable_dt = 1
 
 [physics]
 scale = 0.02
 
 [script]
 shared_state = 1
+
+[graphics]
+max_draw_calls = 2048
+texture_profiles = /texture_profiles.texture_profiles
+
+[resource]
+max_resources = 2048
+
+[collection]
+max_instances = 2048
+
+[sprite]
+max_count = 512
+
+[android]
+immersive_mode = 1
+
+[profiler]
+track_cpu = 1
+
+[library]
+include_dirs = screen_manager
 

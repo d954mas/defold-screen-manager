@@ -1,0 +1,7 @@
+
+function on_message(self, message_id, message, sender)
+	
+	print("here")
+	gui.set_text(gui.get_node("text"), message.text)
+end
+

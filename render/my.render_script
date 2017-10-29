@@ -1,0 +1,80 @@
+local MsgReceiver = require "libs.msg_receiver"
+local HASHES = require "libs.hashes"
+local CONSTANTS = require "libs.constants"
+local screen = require "libs.screen"
+
+local function set_view_projection(self, message_id, message)
+    self.view = message.view	
+end
+
+local function window_resized(self, message_id, message)
+	local width, height  = render.get_window_width(), render.get_window_height()
+	screen.screen_width = width
+	screen.screen_height = height
+	self.gui_projection = vmath.matrix4_orthographic(0, width, 0, height, -1, 1)
+	local w = CONSTANTS.WORLD_WIDTH
+	local h = w * height/width
+	screen.world_width = w
+	screen.world_height = h
+	self.projection = vmath.matrix4_orthographic(- w / 2, w / 2, -h / 2, h / 2, -1000, 1000)
+end	
+
+function init(self)
+    self.tile_pred = render.predicate({"tile"})
+    self.gui_pred = render.predicate({"gui"})
+    self.text_pred = render.predicate({"text"})
+    self.particle_pred = render.predicate({"particle"})
+    self.no_adjust_gui_pred = render.predicate({"no_adjust_gui"})
+
+    self.clear_color = vmath.vector4(0, 0, 0, 0)
+    self.clear_table = {[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0}
+    self.view = vmath.matrix4()
+    self.empty_view = vmath.matrix4()
+    
+    window_resized(self)
+
+	self.msg_receiver = MsgReceiver.new()
+	self.msg_receiver:add(HASHES.MSG_RENDER_SET_VIEW_PROJECTION, set_view_projection)
+	self.msg_receiver:add(HASHES.MSG_RENDER_WINDOW_RESIZED, window_resized)
+end
+
+function update(self)
+    render.set_depth_mask(true)
+    render.set_stencil_mask(0xff)
+    render.clear(self.clear_table)
+
+    render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
+    render.set_view(self.view)
+
+    render.set_depth_mask(false)
+    render.disable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_STENCIL_TEST)
+    render.enable_state(render.STATE_BLEND)
+    render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
+    render.disable_state(render.STATE_CULL_FACE)
+
+    render.set_projection(self.projection)
+
+	render.enable_state(render.STATE_STENCIL_TEST)
+	render.draw(self.no_adjust_gui_pred)
+    render.disable_state(render.STATE_STENCIL_TEST)
+
+    render.draw(self.tile_pred)
+    render.draw(self.particle_pred)
+    render.draw_debug3d()
+
+    render.set_view(self.empty_view)
+    render.set_projection(self.gui_projection)
+
+    render.enable_state(render.STATE_STENCIL_TEST)
+    render.draw(self.gui_pred)
+    render.draw(self.text_pred)
+    render.disable_state(render.STATE_STENCIL_TEST)
+
+    render.set_depth_mask(false)
+    render.draw_debug2d()
+end
+
+function on_message(self, message_id, message)
+	self.msg_receiver:on_message(self, message_id, message, sender)
+end

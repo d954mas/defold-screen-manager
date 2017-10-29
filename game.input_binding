@@ -1,0 +1,12 @@
+key_trigger {
+  input: KEY_BACKSPACE
+  action: "back_scene"
+}
+key_trigger {
+  input: KEY_BACK
+  action: "back_scene"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "touch"
+}

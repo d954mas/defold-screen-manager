@@ -1,0 +1,18 @@
+images {
+  image: "/assets/img/map/FantasyWorldMap_2.png"
+}
+images {
+  image: "/assets/img/map/objects/1.png"
+}
+images {
+  image: "/assets/img/map/objects/17.png"
+}
+images {
+  image: "/assets/img/map/objects/18.png"
+}
+images {
+  image: "/assets/img/map/objects/21.png"
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

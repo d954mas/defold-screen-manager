@@ -1,0 +1,19 @@
+local MsgReceiver = require "libs.msg_receiver"
+local HASHES = require "libs.hashes"
+local SCREEN_HASHES = require "screen_manager.hashes"
+local CONSTANTS = require "libs.constants"
+local screen = require "libs.screen"
+
+local function on_scene_input(self, message_id, message)
+    pprint(message)
+    msg.post("/gui#gui","set_text",{text = message.input.lvl})
+end
+
+function init(self)
+	self.msg_receiver = MsgReceiver.new()
+	self.msg_receiver:add(SCREEN_HASHES.MSG_SEND_INPUT, on_scene_input)
+end
+
+function on_message(self, message_id, message, sender)
+	self.msg_receiver:on_message(self, message_id, message)
+end
