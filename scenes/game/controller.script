@@ -5,7 +5,6 @@ local CONSTANTS = require "libs.constants"
 local screen = require "libs.screen"
 
 local function on_scene_input(self, message_id, message)
-    pprint(message)
     msg.post("/gui#gui","set_text",{text = message.input.lvl})
 end
 
